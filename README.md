@@ -5,7 +5,7 @@ This repository contains a dockerized version of [the npm driver for Wappalyzer]
 
 ## To run it:
 ```
-docker run --name wappalyzer-api --rm -p 3001:3001 bastienl/docker-wappalyzer-api
+docker run --name wappalyzer-api --rm -p 3001:3001 bastienl/wappalyzer-api
 ```
 
 ## To use it:
