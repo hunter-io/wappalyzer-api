@@ -16,7 +16,7 @@ curl -XPOST 'localhost:3001/extract?pretty' -d 'url=https://google.com'
 ```
 
 JSON style:
-````
+```
 curl -XPOST 'localhost:3001/extract?pretty' -H "Content-Type: application/json" -d '{"url": "https://google.com"}'
 ```
 
