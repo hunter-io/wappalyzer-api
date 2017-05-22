@@ -34,15 +34,15 @@ if(cluster.isMaster) {
 
       if (validUrl.isUri(url)) {
         wappalyzer.run([url, '--quiet'], function(stdout, stderr) {
-          if (stdout) {
-            res.send(stdout);
+          if(stderr) {
+            res.status(400).send(stderr);
           }
-          if (stderr) {
-            res.sendStatus(400).send(stderr);
+          else if(stdout) {
+            res.send(stdout);
           }
         });
       } else {
-        res.sendStatus(422);
+        res.status(422).end();
       }
     });
 
