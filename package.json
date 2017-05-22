@@ -1,6 +1,6 @@
 {
   "name": "wappalyzer-api",
-  "description": "API to Uncovers the technologies used on website",
+  "description": "API to uncover the technologies used on website",
   "homepage": "https://github.com/BastienL/docker-wappalyzer-api",
   "version": "0.0.1",
   "author": "Bastien Libersa",
@@ -14,6 +14,7 @@
     "wappalyzer": "*",
     "express": "*",
     "valid-url": "*",
-    "body-parser": "*"
+    "body-parser": "*",
+    "cluster": "*"
   }
 }
