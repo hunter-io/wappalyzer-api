@@ -1,7 +1,7 @@
 docker-wappalyzer-api
 =====
 
-This repository contains a dockerized version of [the npm driver for Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm).
+This repository contains a dockerized version of [the npm driver for Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm). It aims to convert it to an API endpoint you can call from anywhere.
 
 ## To run it:
 ```
