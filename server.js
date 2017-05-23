@@ -17,6 +17,7 @@ if(cluster.isMaster) {
 
     cluster.on('exit', (worker, code, signal) => {
       console.log(`Worker ${worker.process.pid} died`);
+      cluster.fork();
     });
 } else {
     const app = express();
@@ -29,11 +30,16 @@ if(cluster.isMaster) {
 
     app.post('/extract', function(req, res) {
       var url = req.body.url;
+      var timeout = parseInt(req.body.timeout);
 
-      console.log(`Extracting technologies for ${url}`);
+      if(isNaN(timeout) || timeout < 5000) {
+        timeout = 5000;
+      }
+
+      console.log(`Extracting technologies for ${url} with a ${timeout}ms timeout`);
 
       if (validUrl.isUri(url)) {
-        wappalyzer.run([url, '--quiet'], function(stdout, stderr) {
+        wappalyzer.run([url, '--quiet', `--resource-timeout=${timeout}`], function(stdout, stderr) {
           if(stderr) {
             res.status(400).send(stderr);
           }

@@ -20,6 +20,11 @@ JSON style:
 curl -XPOST 'localhost:3001/extract?pretty' -H "Content-Type: application/json" -d '{"url": "https://google.com"}'
 ```
 
+You can also use the `timeout` param (integer in milliseconds) to tell the API to abort the connection after 'timeout' ms:
+```
+curl -XPOST 'localhost:3001/extract?pretty' -H "Content-Type: application/json" -d '{"url": "https://google.com", "timeout": "2000"}'
+```
+
 ## License:
 
 Derived work of [Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm).
