@@ -26,15 +26,23 @@ app.post('/extract', function(req, res) {
 
   if (validUrl.isUri(url)) {
     wappalyzer.run([url, '--quiet', `--resource-timeout=${timeout}`], function(stdout, stderr) {
+      status = 200;
+      response = stdout;
+
       if(stderr) {
-        res.status(400).send(stderr);
+        status = 400;
+        response = stderr;
       }
-      else if(stdout) {
-        res.send(stdout);
+
+      if(res.headersSent == false) {
+        res.set("Connection", "close").status(status).send(response);
+      }
+      else {
+        res.end();
       }
     });
   } else {
-    res.status(422).end();
+    res.set("Connection", "close").status(422).end();
   }
 });
 
