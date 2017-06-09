@@ -21,10 +21,8 @@ type Application struct {
 	Name string `json:"name"`
 }
 
-var waitFor = time.Second * 2
 var navigationTimeout = time.Second * 10
 var stableAfter = time.Millisecond * 450
-var stabilityTimeout = time.Second * 2
 
 // Extract extracts all the technologies present on the passed URL
 func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
@@ -48,7 +46,7 @@ func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 
 	tab.WaitStable()
 
-	// appending to the tab all the wappalyzer files
+	// appending to the page all the required wappalyzer files
 	wappalyzerFile, err := getFileAsString("/extraction/js/wappalyzer.js")
 	if err != nil {
 		log.Printf("error opening wappalyzer file: %v\n", err)
@@ -85,6 +83,8 @@ func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 		return result, err
 	}
 
+	// tiny JS file which declares the function getDetectedApps()
+	// that makes the "bridge" between Chrome and the Go code
 	detectionFile, err := getFileAsString("/extraction/js/detection.js")
 	if err != nil {
 		log.Printf("error opening detection file: %v\n", err)
