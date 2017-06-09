@@ -18,7 +18,7 @@ docker run --name wappalyzer-api --rm -p 3001:3001 bastienl/wappalyzer-api
 ## To use it:
 
 ```
-curl -XPOST 'localhost:3001/extract?pretty' -d 'url=https://google.com'
+curl -XPOST 'localhost:3001/extract' -d 'url=https://google.com'
 ```
 
 ## License:
