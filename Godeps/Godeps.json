@@ -1,0 +1,27 @@
+{
+	"ImportPath": "github.com/bastienl/docker-wappalyzer-api",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/wirepair/autogcd",
+			"Rev": "803c60e0fe4ad7e24f4ad2b2f2a26ae95722d031"
+		},
+		{
+			"ImportPath": "github.com/wirepair/gcd",
+			"Rev": "ff9f0ca5e31a19ee9862a6aa427f4019233c78ab"
+		},
+		{
+			"ImportPath": "github.com/wirepair/gcd/gcdapi",
+			"Rev": "ff9f0ca5e31a19ee9862a6aa427f4019233c78ab"
+		},
+		{
+			"ImportPath": "github.com/wirepair/gcd/gcdmessage",
+			"Rev": "ff9f0ca5e31a19ee9862a6aa427f4019233c78ab"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "59a0b19b5533c7977ddeb86b017bf507ed407b12"
+		}
+	]
+}

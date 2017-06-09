@@ -1,7 +1,14 @@
 docker-wappalyzer-api
 =====
 
-This repository contains a dockerized version of [the npm driver for Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm). It aims to convert it to an API endpoint you can call from anywhere.
+This repository contains a dockerized and 'API-fied' version of [Wappalyzer](https://github.com/AliasIO/Wappalyzer). It aims to make it available through an API endpoint you can call from anywhere. It uses Chrome Headless as execution engine and is built in Go.
+
+## To build it:
+```
+env GOOS=linux GOARCH=amd64 go build -o server
+
+docker build bastienl/wappalyzer-api
+```
 
 ## To run it:
 ```
@@ -10,24 +17,12 @@ docker run --name wappalyzer-api --rm -p 3001:3001 bastienl/wappalyzer-api
 
 ## To use it:
 
-`x-www-form-urlencoded` style:
 ```
 curl -XPOST 'localhost:3001/extract?pretty' -d 'url=https://google.com'
 ```
 
-JSON style:
-```
-curl -XPOST 'localhost:3001/extract?pretty' -H "Content-Type: application/json" -d '{"url": "https://google.com"}'
-```
-
-You can also use the `timeout` param (integer in milliseconds) to tell the API to abort the connection after 'timeout' ms:
-```
-curl -XPOST 'localhost:3001/extract?pretty' -H "Content-Type: application/json" -d '{"url": "https://google.com", "timeout": "2000"}'
-```
-
 ## License:
 
-Derived work of [Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm).
+Derived work of [Wappalyzer](https://github.com/AliasIO/Wappalyzer/tree/master/src/drivers/npm) and [Automatic Google Chrome Debugger](https://github.com/wirepair/autogcd).
 
 Licensed under [GPL-3.0](https://opensource.org/licenses/GPL-3.0).
-
