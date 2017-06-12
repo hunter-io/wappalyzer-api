@@ -24,12 +24,17 @@ type Application struct {
 var navigationTimeout = time.Second * 10
 var stableAfter = time.Millisecond * 450
 
+// Healthy is set to false when an unexpected error occured, that might indicate
+// Chrome should be restarted
+var Healthy = true
+
 // Extract extracts all the technologies present on the passed URL
 func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 	result := Result{URL: URL, Applications: make([]Application, 0)}
 
 	tab, err := auto.NewTab()
 	if err != nil {
+		Healthy = false
 		log.Printf("error creating a tab: %v", err)
 		return result, err
 	}
@@ -113,6 +118,9 @@ func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 	result.Applications = applications
 
 	log.Printf("found %d applications for %v\n", len(applications), URL)
+
+	// the extraction succeeded, our app is healthy
+	Healthy = true
 
 	return result, nil
 }

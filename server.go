@@ -41,10 +41,21 @@ func main() {
 		return
 	}
 
-	// kind of "health-check" endpoint
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "200 OK")
+		return
+	})
+
+	// health-check endpoint
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		if extraction.Healthy {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, "200 OK")
+			return
+		}
+
+		writeResponseError(w, http.StatusInternalServerError, errors.New("Chrome must be restarted"))
 		return
 	})
 
