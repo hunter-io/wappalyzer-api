@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/bastienl/docker-wappalyzer-api",
+	"ImportPath": "github.com/hunter-io/docker-wappalyzer-api",
 	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Deps": [

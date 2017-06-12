@@ -7,12 +7,12 @@ This repository contains a dockerized and 'API-fied' version of [Wappalyzer](htt
 ```
 env GOOS=linux GOARCH=amd64 go build -o server
 
-docker build bastienl/wappalyzer-api
+docker build hunter-io/wappalyzer-api
 ```
 
 ## To run it:
 ```
-docker run --name wappalyzer-api --rm -p 3001:3001 bastienl/wappalyzer-api
+docker run --name wappalyzer-api --rm -p 3001:3001 hunter-io/wappalyzer-api
 ```
 
 ## To use it:

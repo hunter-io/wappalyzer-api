@@ -11,7 +11,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/bastienl/docker-wappalyzer-api/extraction"
+	"github.com/hunter-io/docker-wappalyzer-api/extraction"
 	"github.com/wirepair/autogcd"
 )
 
