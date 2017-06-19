@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/hunter-io/docker-wappalyzer-api/extraction"
 	"github.com/wirepair/autogcd"
@@ -84,6 +85,19 @@ func main() {
 		result, err := extraction.Extract(autoGcd, URLToExtractFrom)
 		if err != nil {
 			// failure during the extraction
+
+			// if we receive this error, it means Chrome has crashed so we can
+			// just restart it
+			if strings.Contains(err.Error(), "getsockopt: connection refused") {
+				newAutoGcd, restartErr := createAutoGcd()
+				if restartErr != nil {
+					writeResponseError(w, http.StatusInternalServerError, restartErr)
+					return
+				}
+
+				autoGcd = newAutoGcd
+			}
+
 			writeResponseError(w, http.StatusInternalServerError, err)
 			return
 		}
