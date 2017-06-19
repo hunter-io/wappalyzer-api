@@ -91,6 +91,10 @@ func main() {
 			if strings.Contains(err.Error(), "getsockopt: connection refused") {
 				newAutoGcd, restartErr := createAutoGcd()
 				if restartErr != nil {
+					// we were not able to restart Chrome, the whole container must be
+					// restarted
+					extraction.Healthy = false
+
 					writeResponseError(w, http.StatusInternalServerError, restartErr)
 					return
 				}

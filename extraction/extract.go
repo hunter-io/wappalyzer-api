@@ -34,7 +34,6 @@ func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 
 	tab, err := auto.NewTab()
 	if err != nil {
-		Healthy = false
 		log.Printf("error creating a tab: %v", err)
 		return result, err
 	}
