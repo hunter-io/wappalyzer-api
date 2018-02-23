@@ -21,8 +21,14 @@ type Application struct {
 	Name string `json:"name"`
 }
 
+// time to wait for navigation before giving up
 var navigationTimeout = time.Second * 10
+
+// time to wait for no node changes before we consider the DOM stable
 var stableAfter = time.Millisecond * 450
+
+// time to wait before checking if the DOM is stable
+var stabilityTimeout = time.Second * 3
 
 // Healthy is set to false when an unexpected error occured, that might indicate
 // Chrome should be restarted
@@ -41,8 +47,9 @@ func Extract(auto *autogcd.AutoGcd, URL string) (Result, error) {
 
 	tab.SetNavigationTimeout(navigationTimeout)
 	tab.SetStabilityTime(stableAfter)
+	tab.SetStabilityTimeout(stabilityTimeout)
 
-	_, err = tab.Navigate(URL)
+	_, _, err = tab.Navigate(URL)
 	if err != nil {
 		log.Printf("error navigating to URL %v: %v\n", URL, err)
 		return result, nil
