@@ -42,6 +42,8 @@ func main() {
 		return
 	}
 
+	ch := make(chan bool, 5)
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, "200 OK")
@@ -82,7 +84,12 @@ func main() {
 			return
 		}
 
+		ch <- true
+
 		result, err := extraction.Extract(autoGcd, URLToExtractFrom)
+
+		<-ch
+
 		if err != nil {
 			// failure during the extraction
 
