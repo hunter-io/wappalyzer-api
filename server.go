@@ -93,9 +93,11 @@ func main() {
 		if err != nil {
 			// failure during the extraction
 
-			// if we receive this error, it means Chrome has crashed so we can
-			// just restart it
+			// if we receive this error, it means Chrome has crashed so we close it
+			// and restart a fresh instance
 			if strings.Contains(err.Error(), "getsockopt: connection refused") {
+				autoGcd.Shutdown()
+
 				newAutoGcd, restartErr := createAutoGcd()
 				if restartErr != nil {
 					// we were not able to restart Chrome, the whole container must be
