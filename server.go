@@ -42,7 +42,7 @@ func main() {
 		return
 	}
 
-	ch := make(chan bool, 5)
+	ch := make(chan bool, 3)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
