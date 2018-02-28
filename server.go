@@ -1,48 +1,46 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 
+	"github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/client"
 	"github.com/hunter-io/docker-wappalyzer-api/extraction"
-	"github.com/wirepair/autogcd"
 )
 
 var (
-	port       int
-	chromePath string
-	userDir    string
-	chromePort string
+	port      int    // port number the API will be served on
+	chromeURL string // URL of the remote Chrome instance to connect to
 )
-
-var startupFlags = []string{"--disable-new-tab-first-run", "--no-first-run", "--disable-translate", "--headless", " --disable-gpu", "--ignore-certificate-errors", "--allow-running-insecure-content", "--no-sandbox"}
 
 func init() {
 	flag.IntVar(&port, "port", 3001, "port number to serve the API on")
-	flag.StringVar(&chromePath, "chromePath", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "path to chrome")
-	flag.StringVar(&userDir, "tmpDir", "/tmp/", "temp directory")
-	flag.StringVar(&chromePort, "chromePort", "9222", "debugger port")
+	flag.StringVar(&chromeURL, "chromeURL", "http://localhost:9222/json", "Chrome URL to connect to")
+
+	flag.Parse()
 }
 
 func main() {
-	flag.Parse()
+	// create context
+	ctxt, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	// starts autoGcd
-	autoGcd, startErr := createAutoGcd()
-	if startErr != nil {
-		log.Fatalf("cannot start Chrome: %v", startErr)
+	// create Chrome
+	chrome, chromeErr := chromedp.New(ctxt, chromedp.WithTargets(client.New(client.URL(chromeURL)).WatchPageTargets(ctxt)))
+	if chromeErr != nil {
+		log.Fatalf("cannot start Chrome: %v", chromeErr)
 		return
 	}
 
-	ch := make(chan bool, 3)
+	// limits the concurrency to one extraction at a time
+	ch := make(chan bool, 1)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -86,30 +84,13 @@ func main() {
 
 		ch <- true
 
-		result, err := extraction.Extract(autoGcd, URLToExtractFrom)
+		result, err := extraction.Extract(ctxt, chrome, URLToExtractFrom)
 
 		<-ch
 
 		if err != nil {
 			// failure during the extraction
-
-			// if we receive this error, it means Chrome has crashed so we close it
-			// and restart a fresh instance
-			if strings.Contains(err.Error(), "getsockopt: connection refused") {
-				autoGcd.Shutdown()
-
-				newAutoGcd, restartErr := createAutoGcd()
-				if restartErr != nil {
-					// we were not able to restart Chrome, the whole container must be
-					// restarted
-					extraction.Healthy = false
-
-					writeResponseError(w, http.StatusInternalServerError, restartErr)
-					return
-				}
-
-				autoGcd = newAutoGcd
-			}
+			extraction.Healthy = false
 
 			writeResponseError(w, http.StatusInternalServerError, err)
 			return
@@ -125,10 +106,10 @@ func main() {
 		w.Write(jsonData)
 	})
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "could not start http server: %s\n", err)
-		os.Exit(1)
+	serverErr := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	if serverErr != nil {
+		log.Fatalf("cannot start http server: %v", serverErr)
+		return
 	}
 }
 
@@ -136,28 +117,4 @@ func writeResponseError(w http.ResponseWriter, statusCode int, err error) {
 	log.Printf("%v: %v", http.StatusText(statusCode), err)
 	w.WriteHeader(statusCode)
 	fmt.Fprint(w, fmt.Sprintf("%d %v", statusCode, http.StatusText(statusCode)))
-}
-
-func randUserDir() string {
-	dir, err := ioutil.TempDir(userDir, "autogcd")
-	if err != nil {
-		log.Printf("error getting temp dir: %s\n", err)
-	}
-	return dir
-}
-
-func createAutoGcd() (*autogcd.AutoGcd, error) {
-	settings := autogcd.NewSettings(chromePath, randUserDir())
-	settings.RemoveUserDir(true)
-	settings.AddStartupFlags(startupFlags)
-
-	auto := autogcd.NewAutoGcd(settings)
-	auto.SetTerminationHandler(nil)
-
-	err := auto.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	return auto, nil
 }
