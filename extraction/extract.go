@@ -20,12 +20,19 @@ type Application struct {
 	Name string `json:"name"`
 }
 
-// Healthy is set to false when an unexpected error occured, that might indicate
-// the container should be restarted
+// Healthy is set to false when an error occured, that indicates the container
+// should be restarted
 var Healthy = true
 
-// Extract extracts all the technologies present on the passed URL
+// Extract extracts all the technologies present on the provided URL
 func Extract(wd selenium.WebDriver, URL string) (Result, error) {
+	defer func() {
+		if e := recover(); e != nil {
+			log.Printf("App is unhealthy")
+			Healthy = false
+		}
+	}()
+
 	result := Result{URL: URL, Applications: make([]Application, 0)}
 
 	wappalyzerFile, err := getFileAsString("/extraction/js/wappalyzer.js")

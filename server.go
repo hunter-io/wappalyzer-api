@@ -52,7 +52,7 @@ func main() {
 			return
 		}
 
-		writeResponseError(w, http.StatusInternalServerError, errors.New("Chrome must be restarted"))
+		writeResponseError(w, http.StatusInternalServerError, errors.New("App is unhealthy"))
 		return
 	})
 
