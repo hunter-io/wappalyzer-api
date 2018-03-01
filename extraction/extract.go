@@ -1,14 +1,12 @@
 package extraction
 
 import (
-	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
-	"time"
 
-	"github.com/chromedp/cdproto/runtime"
-	"github.com/chromedp/chromedp"
+	"github.com/tebeka/selenium"
 )
 
 // Result contains the result of a wappalyzer extraction
@@ -27,7 +25,7 @@ type Application struct {
 var Healthy = true
 
 // Extract extracts all the technologies present on the passed URL
-func Extract(ctxt context.Context, chrome *chromedp.CDP, URL string) (Result, error) {
+func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 	result := Result{URL: URL, Applications: make([]Application, 0)}
 
 	wappalyzerFile, err := getFileAsString("/extraction/js/wappalyzer.js")
@@ -54,28 +52,33 @@ func Extract(ctxt context.Context, chrome *chromedp.CDP, URL string) (Result, er
 		return result, err
 	}
 
-	var apps []string
-	var evaluationResult *runtime.RemoteObject
-
-	err = chrome.Run(ctxt, chromedp.Tasks{
-		chromedp.Navigate(URL),
-		chromedp.Sleep(2 * time.Second),
-		chromedp.Evaluate(wappalyzerFile, &evaluationResult),
-		chromedp.Evaluate(appsFile, &evaluationResult),
-		chromedp.Evaluate(driverFile, &evaluationResult),
-		chromedp.Evaluate(detectionFile, &evaluationResult),
-		chromedp.Evaluate(`getDetectedApps();`, &apps),
-	})
+	_, err = wd.NewSession()
 	if err != nil {
-		log.Printf("error detecting apps: %v\n", err)
+		log.Printf("error creating a new session: %v\n", err)
+		return result, err
+	}
+
+	err = wd.Get(URL)
+	if err != nil {
+		log.Printf("error fetching %v: %v\n", URL, err)
+		return result, err
+	}
+
+	data, err := wd.ExecuteScript(wappalyzerFile+" "+appsFile+" "+driverFile+" "+detectionFile+" "+"return JSON.stringif();", nil)
+	if err != nil {
+		log.Printf("error: %v", err.Error())
 		return result, err
 	}
 
 	applications := []Application{}
 
-	for _, app := range apps {
-		applications = append(applications, Application{Name: app})
+	for _, v := range data.([]interface{}) {
+		application := Application{Name: fmt.Sprintf("%v", v)}
+		applications = append(applications, application)
 	}
+
+	// we end the current session
+	wd.Quit()
 
 	result.Applications = applications
 

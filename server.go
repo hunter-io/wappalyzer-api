@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -10,34 +9,31 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/chromedp/chromedp"
-	"github.com/chromedp/chromedp/client"
 	"github.com/hunter-io/docker-wappalyzer-api/extraction"
+	"github.com/tebeka/selenium"
 )
 
 var (
-	port      int    // port number the API will be served on
-	chromeURL string // URL of the remote Chrome instance to connect to
+	port        int    // port number the API will be served on
+	seleniumURL string // URL of the remote Selenium instance to connect to
 )
 
 func init() {
 	flag.IntVar(&port, "port", 3001, "port number to serve the API on")
-	flag.StringVar(&chromeURL, "chromeURL", "http://localhost:9222/json", "Chrome URL to connect to")
+	flag.StringVar(&seleniumURL, "seleniumURL", "http://localhost:4444/wd/hub", "Selenium URL to connect to")
 
 	flag.Parse()
 }
 
 func main() {
-	// create context
-	ctxt, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	caps := selenium.Capabilities{"browserName": "chrome"}
 
-	// create Chrome
-	chrome, chromeErr := chromedp.New(ctxt, chromedp.WithTargets(client.New(client.URL(chromeURL)).WatchPageTargets(ctxt)))
-	if chromeErr != nil {
-		log.Fatalf("cannot start Chrome: %v", chromeErr)
+	wd, err := selenium.NewRemote(caps, seleniumURL)
+	if err != nil {
+		log.Fatalf("cannot connect to Selenium: %v", err)
 		return
 	}
+	defer wd.Quit()
 
 	// limits the concurrency to one extraction at a time
 	ch := make(chan bool, 1)
@@ -84,7 +80,7 @@ func main() {
 
 		ch <- true
 
-		result, err := extraction.Extract(ctxt, chrome, URLToExtractFrom)
+		result, err := extraction.Extract(wd, URLToExtractFrom)
 
 		<-ch
 
