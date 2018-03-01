@@ -64,7 +64,7 @@ func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 		return result, err
 	}
 
-	data, err := wd.ExecuteScript(wappalyzerFile+" "+appsFile+" "+driverFile+" "+detectionFile+" "+"return JSON.stringif();", nil)
+	data, err := wd.ExecuteScript(wappalyzerFile+" "+appsFile+" "+driverFile+" "+detectionFile+" "+"return getDetectedApps();", nil)
 	if err != nil {
 		log.Printf("error: %v", err.Error())
 		return result, err
