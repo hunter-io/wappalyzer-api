@@ -46,7 +46,7 @@ func main() {
 
 	// health-check endpoint
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		if extraction.Healthy {
+		if extraction.FailedExtractions < 10 {
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, "200 OK")
 			return
@@ -85,9 +85,7 @@ func main() {
 		<-ch
 
 		if err != nil {
-			// failure during the extraction
-			extraction.Healthy = false
-
+			log.Printf("extraction failed (count: %d\n)", extraction.FailedExtractions)
 			writeResponseError(w, http.StatusInternalServerError, err)
 			return
 		}
