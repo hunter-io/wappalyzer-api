@@ -20,16 +20,14 @@ type Application struct {
 	Name string `json:"name"`
 }
 
-// Healthy is set to false when an error occured, that indicates the container
-// should be restarted
-var Healthy = true
+// FailedExtractions counts how many extractions have failed in a row.
+var FailedExtractions = 0
 
 // Extract extracts all the technologies present on the provided URL
 func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 	defer func() {
 		if e := recover(); e != nil {
-			log.Printf("App is unhealthy")
-			Healthy = false
+			FailedExtractions++
 		}
 	}()
 
@@ -62,12 +60,14 @@ func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 	_, err = wd.NewSession()
 	if err != nil {
 		log.Printf("error creating a new session: %v\n", err)
+		FailedExtractions++
 		return result, err
 	}
 
 	err = wd.Get(URL)
 	if err != nil {
 		log.Printf("error fetching %v: %v\n", URL, err)
+		FailedExtractions++
 		return result, err
 	}
 
@@ -80,8 +80,7 @@ func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 	applications := []Application{}
 
 	for _, v := range data.([]interface{}) {
-		application := Application{Name: fmt.Sprintf("%v", v)}
-		applications = append(applications, application)
+		applications = append(applications, Application{Name: fmt.Sprintf("%v", v)})
 	}
 
 	// we end the current session
@@ -91,8 +90,7 @@ func Extract(wd selenium.WebDriver, URL string) (Result, error) {
 
 	log.Printf("found %d applications for %v\n", len(applications), URL)
 
-	// the extraction succeeded, our app is healthy
-	Healthy = true
+	FailedExtractions = 0
 
 	return result, nil
 }
