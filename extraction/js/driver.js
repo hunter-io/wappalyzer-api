@@ -50,16 +50,16 @@
 
 			var xhr = new XMLHttpRequest();
 
-			xhr.open('GET', url, true);
+			xhr.open('GET', url, false);
 
 			xhr.onreadystatechange = function() {
 				if ( xhr.readyState === 4 && xhr.status ) {
-					var headers = xhr.getAllResponseHeaders().split("\n");
+					var xhr_headers = xhr.getAllResponseHeaders().split("\n");
 
-					if ( headers.length > 0 && headers[0] != '' ) {
-						w.log('responseHeaders: ' + xhr.getAllResponseHeaders());
+					if ( xhr_headers.length > 0 && xhr_headers[0] != '' ) {
+						w.log('responseHeaders: ' + xhr_headers);
 
-						headers.forEach(function(line) {
+						xhr_headers.forEach(function(line) {
 							var name, value;
 
 							if ( line ) {
