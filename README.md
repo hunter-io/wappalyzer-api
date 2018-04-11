@@ -7,7 +7,7 @@ This repository contains a dockerized and 'API-fied' version of [Wappalyzer](htt
 ```
 env GOOS=linux GOARCH=amd64 go build -o server
 
-docker build hunter-io/wappalyzer-api .
+docker build -t hunter-io/wappalyzer-api .
 ```
 
 ## To run it:
