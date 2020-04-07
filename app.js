@@ -3,14 +3,18 @@ const app = express()
 const port = 3000
 
 app.get('/', (req, res) => {
+  res.send('Wappalyzer API is ready! 🚀')
+})
+
+app.get('/extract', (req, res) => {
   const Wappalyzer = require('wappalyzer')
 
   // TODO: Handle missing URL
 
   let url = req.query.url
 
-  if (url == undefined || url == "") {
-    res.status(400).send("missing url query parameter")
+  if (url == undefined || url == '') {
+    res.status(400).send('missing url query parameter')
     return
   }
 
