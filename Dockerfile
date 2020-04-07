@@ -1,12 +1,20 @@
-FROM debian:sid
+FROM node:12-alpine
 
-# Copy the binary server
-ADD server /server
-RUN cp /server /usr/local/bin/wappalyzer-server
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+# ENV CHROME_BIN /usr/bin/chromium-browser
 
-# Copy the JS files
-ADD extraction/js/ extraction/js/
+RUN apk update && apk add --no-cache \
+	nodejs \
+	nodejs-npm \
+  udev \
+  # chromium \
+  ttf-freefont
 
-EXPOSE 3001
+ADD *.json /
+ADD *.js /
 
-ENTRYPOINT ["wappalyzer-server"]
+RUN npm i
+
+# RUN /usr/bin/chromium-browser --version
+
+ENTRYPOINT ["node", "app.js"]

@@ -1,0 +1,31 @@
+{
+  "name": "wappalyzer-api",
+  "description": "API returning technologies used by a website",
+  "homepage": "https://www.wappalyzer.com",
+  "version": "2.0.0",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hunter-io/docker-wappalyzer-api"
+  },
+  "main": "app.js",
+  "files": [
+    "browser.js",
+    "browsers/zombie.js",
+    "browsers/puppeteer.js",
+    "cli.js",
+    "driver.js",
+    "index.js",
+    "app.js",
+    "wappalyzer.js"
+  ],
+  "dependencies": {
+    "express": "^4.17.1",
+    "puppeteer": "^2.1.1",
+    "wappalyzer": "^5.9.31",
+    "zombie": "^6.1.4"
+  },
+  "peerDependencies": {
+    "puppeteer": "^2.0.0"
+  }
+}
