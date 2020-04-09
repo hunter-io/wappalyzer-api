@@ -1,15 +1,18 @@
 const express = require('express')
+const Wappalyzer = require('wappalyzer')
+const morgan = require('morgan')
+
+const PORT = 3000
 
 const app = express()
 
-const PORT = 3000
+app.use(morgan('combined'))
 
 app.get('/', (req, res) => {
   res.send('Wappalyzer API is ready! 🚀')
 })
 
 app.get('/extract', (req, res) => {
-  const Wappalyzer = require('wappalyzer')
 
   // TODO: Handle missing URL
 
@@ -41,4 +44,4 @@ app.get('/extract', (req, res) => {
     })
 })
 
-app.listen(PORT, () => console.log(`Starting Wappalyzer on http://localhost:${PORT}`))
+app.listen(PORT, () => console.log(`Starting Wappalyzer on http://0.0.0.0:${PORT}`))
