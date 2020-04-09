@@ -17,4 +17,6 @@ RUN npm i
 
 # RUN /usr/bin/chromium-browser --version
 
+EXPOSE 3000
+
 ENTRYPOINT ["node", "app.js"]
