@@ -10,13 +10,15 @@ RUN apk update && apk add --no-cache \
   # chromium \
   ttf-freefont
 
-ADD *.json /
-ADD *.js /
+RUN mkdir /app && chown node /app
+USER 1000
+WORKDIR /app
+
+ADD *.json /app/
+ADD *.js /app/
 
 RUN npm i
 
 # RUN /usr/bin/chromium-browser --version
-
-EXPOSE 3000
 
 ENTRYPOINT ["node", "app.js"]
