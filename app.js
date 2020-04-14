@@ -2,7 +2,7 @@ const express = require('express')
 const Wappalyzer = require('wappalyzer')
 const morgan = require('morgan')
 
-const PORT = 3000
+const PORT = process.env.PORT || 8000
 
 const app = express()
 
@@ -37,7 +37,7 @@ app.get('/extract', (req, res) => {
   const wappalyzer = new Wappalyzer(url, options)
   wappalyzer.analyze()
     .then((json) => {
-      res.send(`${JSON.stringify(json, null, 2)}`)
+      res.json(json)
     })
     .catch((error) => {
       res.status(500).send(`${error}\n`)
