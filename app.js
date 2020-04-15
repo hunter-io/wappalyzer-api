@@ -1,13 +1,18 @@
 const express = require('express')
+const Wappalyzer = require('wappalyzer')
+const morgan = require('morgan')
+
+const PORT = process.env.PORT || 8000
+
 const app = express()
-const port = 3000
+
+app.use(morgan('combined'))
 
 app.get('/', (req, res) => {
   res.send('Wappalyzer API is ready! 🚀')
 })
 
 app.get('/extract', (req, res) => {
-  const Wappalyzer = require('wappalyzer')
 
   // TODO: Handle missing URL
 
@@ -32,11 +37,11 @@ app.get('/extract', (req, res) => {
   const wappalyzer = new Wappalyzer(url, options)
   wappalyzer.analyze()
     .then((json) => {
-      res.send(`${JSON.stringify(json, null, 2)}`)
+      res.json(json)
     })
     .catch((error) => {
       res.status(500).send(`${error}\n`)
     })
 })
 
-app.listen(port, () => console.log(`Starting Wappalyzer on http://localhost:${port}`))
+app.listen(PORT, () => console.log(`Starting Wappalyzer on http://0.0.0.0:${PORT}`))
