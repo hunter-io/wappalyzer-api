@@ -23,7 +23,7 @@ app.get('/extract', (req, res) => {
   }
 
   const options = {
-    // browser: 'puppeteer',
+    browser: 'puppeteer',
     debug: false,
     maxDepth: 1,
     recursive: false,
