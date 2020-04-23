@@ -26,6 +26,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Pull latest image (to speed up the build)
+        run: |
+          IMAGE_ID=$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          docker pull $IMAGE_ID:latest
+
       - name: Build image
         run: docker build . --file Dockerfile --tag image
 
@@ -34,11 +43,6 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_ID=$IMAGE_NAME
-          
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
