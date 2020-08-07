@@ -1419,7 +1419,7 @@
       }
     },
     "wappalyzer": {
-      "version": "github:hunter-io/wappalyzer#3c72b51a4a093110cbbf2cfc69bf35977c64238f",
+      "version": "github:hunter-io/wappalyzer#eab320540257ac8e3a4c422b4100b5341b12cf3e",
       "from": "github:hunter-io/wappalyzer#fix",
       "requires": {
         "cld": "^2.6.0",
