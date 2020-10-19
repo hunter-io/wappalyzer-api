@@ -6,12 +6,12 @@ Pull the images from the Docker Hub to use the API right away: [https://hub.dock
 
 ## To build it:
 ```
-docker build -t hunterio/wappalyzer-api .
+docker build -t ghcr.io/hunter-io/wappalyzer-api:3.6 .
 ```
 
 ## To run it:
 ```
-docker run -p 3000:3000 hunterio/wappalyzer-api
+docker run -p 3000:3000 ghcr.io/hunter-io/wappalyzer-api:3.6
 ```
 
 ## To use it:
