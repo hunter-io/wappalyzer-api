@@ -6,7 +6,7 @@ ENV CHROME_BIN /usr/bin/chromium-browser
 RUN apk update
 RUN apk add --no-cache \
 	nodejs \
-	nodejs-npm \
+	npm \
   udev \
   chromium \
   ttf-freefont \
