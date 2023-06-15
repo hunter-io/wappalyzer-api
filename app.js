@@ -14,33 +14,42 @@ app.get('/', (req, res) => {
   res.send('Wappalyzer API is ready! 🚀')
 })
 
-app.get('/extract', (req, res) => {
-  let url = req.query.url
+app.get('/extract', async (req, res, next) => {
+  const url = req.query.url
 
   if (url == undefined || url == '') {
-    res.status(400).send('missing url query parameter')
-    return
+    return res.status(400).send('missing url query parameter')
   }
 
   const options = {
-    browser: 'puppeteer',
-    debug: false,
-    maxDepth: 1,
-    recursive: false,
-    maxWait: 20000,
-    userAgent: 'Wappalyzer',
-    htmlMaxCols: 2000,
-    htmlMaxRows: 2000,
+    debug: req.query.debug || false,
+    maxDepth: req.query.maxDepth || 1,
+    recursive: req.query.recursive || false,
+    maxWait: req.query.maxWait || 20000,
+    userAgent: req.query.userAgent || 'Wappalyzer',
+    htmlMaxCols: req.query.htmlMaxCols || 2000,
+    htmlMaxRows: req.query.htmlMaxRows || 2000,
   }
 
-  const wappalyzer = new Wappalyzer(url, options)
-  wappalyzer.analyze()
-    .then((json) => {
-      res.json(json)
-    })
-    .catch((error) => {
-      res.status(500).send(`${error}\n`)
-    })
+  const wappalyzer = new Wappalyzer(options)
+
+  try {
+    await wappalyzer.init()
+
+    const site = await wappalyzer.open(url)
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, parseInt(options.defer || 0, 10))
+    )
+
+    const results = await site.analyze()
+
+    await wappalyzer.destroy()
+
+    res.json(results)
+  } catch (error) {
+    res.status(500).send(`${error}\n`)
+  }
 })
 
 app.listen(PORT, () => console.log(`Starting Wappalyzer on http://0.0.0.0:${PORT}`))

@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:18-alpine
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 ENV CHROME_BIN /usr/bin/chromium-browser
@@ -16,11 +16,10 @@ RUN apk add --no-cache \
   git
 
 RUN mkdir /app && chown node /app
-USER 1000
 WORKDIR /app
 
 ADD *.json /app/
-RUN npm i
+RUN npm install
 
 ADD *.js /app/
 
