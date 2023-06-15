@@ -1,10 +1,14 @@
 name: Docker
 
 on:
+  schedule:
+    # Run every week on Monday at 2PM
+    - cron: "0 14 * * 1"
+
   push:
     # Publish `develop` as Docker `latest` image.
     branches:
-      - develop
+      - master
 
     # Publish `v1.2.3` tags as releases.
     tags:
@@ -33,6 +37,14 @@ jobs:
       - name: Log into GitHub Container Registry
       # TODO: Create a PAT with `read:packages` and `write:packages` scopes and save it as an Actions secret `CR_PAT`
         run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Run image
+        run: docker run -d -p 3000:3000 $IMAGE_NAME # replace with your application's port
+
+      - name: Test the application
+        run: |
+          sleep 10 # Wait for the application to start
+          curl --fail http://localhost:3000/extract?url=https://hunter.io/ # Will fail if the response status is not 200
 
       - name: Push image to GitHub Container Registry
         run: |
