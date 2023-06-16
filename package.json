@@ -22,9 +22,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "morgan": "^1.10.0",
-    "puppeteer": "^2.1.1",
-    "wappalyzer": "github:hunter-io/wappalyzer#fix",
-    "zombie": "^6.1.4"
+    "puppeteer": "~19.7.0",
+    "wappalyzer": "^6.0.0"
   },
   "peerDependencies": {
     "puppeteer": "^2.0.0"
