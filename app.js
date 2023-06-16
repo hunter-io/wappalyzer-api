@@ -52,7 +52,7 @@ app.get('/extract', async (req, res, next) => {
   }
 })
 
-app.listen(PORT, () => console.log(`Starting Wappalyzer on http://0.0.0.0:${PORT}`))
+app.listen(PORT, '0.0.0.0', () => console.log(`Starting Wappalyzer on http://0.0.0.0:${PORT}`))
 
 process.on('uncaughtException', function (err) {
   console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
