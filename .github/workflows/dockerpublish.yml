@@ -42,6 +42,10 @@ jobs:
       - name: Test the application
         run: |
           sleep 10
+
+          # We run the curl command a first time to get the output
+          curl 'http://localhost:3000/extract?url=http://localhost:3000'
+
           if curl --fail 'http://localhost:3000/extract?url=http://localhost:3000'; then
             echo "Curl command succeeded."
           else
