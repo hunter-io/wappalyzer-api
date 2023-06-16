@@ -39,7 +39,7 @@ jobs:
         run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Run image
-        run: docker run -d -p 3000:3000 $IMAGE_NAME # replace with your application's port
+        run: docker run -d -p 3000:3000 --name wappalyzer $IMAGE_NAME # replace with your application's port
 
       - name: Test the application
         run: |
