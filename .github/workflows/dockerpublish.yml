@@ -50,10 +50,7 @@ jobs:
       - name: Test the application
         run: |
           sleep 10
-          OUTPUT=$(curl --fail --silent 'http://localhost:3000/extract?url=http://localhost:3005' 2>&1)
-          EXIT_CODE=$?
-          echo "Curl output: $OUTPUT"
-          if [ $EXIT_CODE -eq 0 ]; then
+          if curl --fail 'http://localhost:3000/extract?url=http://localhost:3005'; then
             echo "Curl command succeeded."
           else
             echo "Curl command failed. Fetching docker logs..."
