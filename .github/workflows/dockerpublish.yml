@@ -27,14 +27,6 @@ jobs:
   push:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
-
-    services:
-      redis:
-        # We use nginx to test the extraction works as expected.
-        image: nginx
-        ports:
-          - 3005:80
-
     steps:
       - uses: actions/checkout@v2
 
@@ -50,7 +42,7 @@ jobs:
       - name: Test the application
         run: |
           sleep 10
-          if curl --fail 'http://localhost:3000/extract?url=http://localhost:3005'; then
+          if curl --fail 'http://localhost:3000/extract?url=http://localhost:3000'; then
             echo "Curl command succeeded."
           else
             echo "Curl command failed. Fetching docker logs..."
