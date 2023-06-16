@@ -43,8 +43,8 @@ jobs:
 
       - name: Test the application
         run: |
-          sleep 10 # Wait for the application to start
-          curl --fail http://localhost:3000/extract?url=https://hunter.io/ # Will fail if the response status is not 200
+          sleep 10
+          curl --fail 'http://localhost:3000/extract?url=https://hunter.io'
 
       - name: Push image to GitHub Container Registry
         run: |
