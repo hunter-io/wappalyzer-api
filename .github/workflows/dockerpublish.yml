@@ -44,7 +44,13 @@ jobs:
       - name: Test the application
         run: |
           sleep 10
-          curl --fail 'http://localhost:3000/extract?url=https://hunter.io'
+          if curl --fail 'http://localhost:3000/extract?url=https://hunter.io'; then
+            echo "Curl command succeeded."
+          else
+            echo "Curl command failed. Fetching docker logs..."
+            docker logs wappalyzer
+            exit 1
+          fi
 
       - name: Push image to GitHub Container Registry
         run: |
