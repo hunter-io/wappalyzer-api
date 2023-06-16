@@ -12,7 +12,7 @@
         "express": "^4.17.1",
         "morgan": "^1.10.0",
         "puppeteer": "~19.7.0",
-        "wappalyzer": "6.10.63"
+        "wappalyzer": "^6.0.0"
       },
       "peerDependencies": {
         "puppeteer": "^2.0.0"
