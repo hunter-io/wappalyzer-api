@@ -10,6 +10,32 @@ if (process.env.DISABLE_REQUESTS_LOGGING == undefined) {
   app.use(morgan('combined'))
 }
 
+function modifyURLs(urls) {
+  for (let urlKey in urls) {
+    let url = urls[urlKey]
+
+    if (url.hasOwnProperty('error') && typeof url.error === 'string') {
+      url.error = {
+        type: url.error,
+        message: "Response was not ok"
+      }
+    }
+
+    if (url.status === 200) {
+      url.statusAfterRedirects = 200
+      url.urlAfterRedirects = urlKey
+    }
+
+    if (url.status === 0) {
+      if (!url.error) url.error = {}
+      url.error.type = "RESPONSE_NOT_OK"
+    }
+  }
+
+  return urls
+}
+
+
 app.get('/', (req, res) => {
   res.send('Wappalyzer API is ready! 🚀')
 })
@@ -22,13 +48,13 @@ app.get('/extract', async (req, res, next) => {
   }
 
   const options = {
-    debug: req.query.debug || false,
-    maxDepth: req.query.maxDepth || 1,
-    recursive: req.query.recursive || false,
-    maxWait: req.query.maxWait || 20000,
-    userAgent: req.query.userAgent || 'Wappalyzer',
-    htmlMaxCols: req.query.htmlMaxCols || 2000,
-    htmlMaxRows: req.query.htmlMaxRows || 2000,
+    debug: false,
+    maxDepth: 1,
+    recursive: false,
+    maxWait: 20000,
+    userAgent: 'Wappalyzer',
+    htmlMaxCols: 2000,
+    htmlMaxRows: 2000,
   }
 
   const wappalyzer = new Wappalyzer(options)
@@ -42,9 +68,31 @@ app.get('/extract', async (req, res, next) => {
       setTimeout(resolve, parseInt(options.defer || 0, 10))
     )
 
-    const results = await site.analyze()
+    let analyzeResult = await site.analyze()
+    let results = analyzeResult
 
-    await wappalyzer.destroy()
+    if (req.query.backward_compatible === 'true') {
+      let { technologies: applications, ...rest } = analyzeResult
+      results = { applications, ...rest }
+
+      results.applications = results.applications.map(app => {
+        app.categories = app.categories.map(category => ({
+          ...category,
+          id: String(category.id)
+        }))
+
+        return app
+      })
+
+      let urls = results.urls
+      urls = modifyURLs(urls)
+      results.urls = urls
+
+      results.urls = urls
+
+    }
+
+    wappalyzer.destroy()
 
     res.json(results)
   } catch (error) {
