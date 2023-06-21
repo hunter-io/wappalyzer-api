@@ -1,10 +1,6 @@
 name: Docker
 
 on:
-  schedule:
-    # Run every week on Monday at 2PM
-    - cron: "0 14 * * 1"
-
   push:
     branches:
       - master
@@ -20,11 +16,36 @@ env:
   IMAGE_NAME: wappalyzer-api
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Run the wappalyzer image
+        run: docker run -d -p 3000:3000 --name wappalyzer $IMAGE_NAME
+
+      - name: Test the application
+        run: |
+          sleep 10
+          # We run the curl command a first time to get the output
+          curl 'http://localhost:3000/extract?url=http://localhost:3000'
+          if curl --fail 'http://localhost:3000/extract?url=http://localhost:3000'; then
+            echo "Curl command succeeded."
+          else
+            echo "Curl command failed. Fetching docker logs..."
+            docker logs wappalyzer
+            exit 1
+          fi
+
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
   push:
+    needs: test
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'schedule'
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v2
 
@@ -33,24 +54,6 @@ jobs:
 
       - name: Log into GitHub Container Registry
         run: echo "${{ secrets.CR_PAT }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Run the wappalyzer image
-        run: docker run -d -p 3000:3000 --name wappalyzer $IMAGE_NAME
-
-      - name: Test the application
-        run: |
-          sleep 10
-
-          # We run the curl command a first time to get the output
-          curl 'http://localhost:3000/extract?url=http://localhost:3000'
-
-          if curl --fail 'http://localhost:3000/extract?url=http://localhost:3000'; then
-            echo "Curl command succeeded."
-          else
-            echo "Curl command failed. Fetching docker logs..."
-            docker logs wappalyzer
-            exit 1
-          fi
 
       - name: Bump version and push tag
         id: tag_version
@@ -74,4 +77,3 @@ jobs:
           # Tag and push image with the 'latest' tag
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
-        if: github.ref == 'refs/heads/master'
