@@ -54,21 +54,18 @@ jobs:
 
       - name: Bump version and push tag
         id: tag_version
-        uses: mathieudutour/github-tag-action@v5.6
+        uses: mathieudutour/github-tag-action@v6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: minor 
+          default_bump: minor
 
       - name: Push image to GitHub Container Registry
-        if: github.ref == 'refs/heads/master'
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Use the new tag
-          VERSION=${{ steps.tag_version.outputs.new_tag }}
-          # Strip "v" prefix from tag name
-          VERSION=$(echo $VERSION | sed -e 's/^v//')
+          VERSION=${{ steps.tag_version.outputs.new_version }}
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           # Tag and push image with the version tag
@@ -77,3 +74,4 @@ jobs:
           # Tag and push image with the 'latest' tag
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:latest
+        if: github.ref == 'refs/heads/master'
